@@ -1,0 +1,52 @@
+Scriptname zadx_SndEffectReBreathingNormal extends ActiveMagicEffect
+{attached to an enchantment which uses the IsMoving condition. when the wearer
+is in motion it will make breathing sounds.}
+
+Sound Property zadx_SndSoundReBreathingNormal Auto
+zadlibs Property libs Auto
+
+;; Original Script and Idea: darkconsole @ LoversLab
+;; Butchered by ElDuderino to simulate breathing sounds through a narrow tube
+;; Used with kind permission by darkconsole. Thank you!
+
+Event OnEffectStart(Actor who, Actor caster)
+	self.OnUpdate()
+	Return
+EndEvent
+
+Event OnUpdate()
+
+	If !libs.UseRubberSounds()
+		return
+	Endif
+
+	If(self == None)
+		;; not sure of the edge cages that cause this. maybe has something
+		;; to do with crossing load boundaries. also can be caused by
+		;; removing the collar before the next ding.
+		Return
+	EndIf
+
+	Actor who = self.GetTargetActor()
+
+	if(who == None)
+		;; i don't think this was a factor but i added it anyway. im pretty
+		;; sure it is only the self causing issues.
+		Return
+	EndIf
+
+        ;Variables adjusted to audio clip length
+	Float min = 3
+	Float max = 3.4
+
+	; Kimy: Added offset variable so adjusting the intervals for different length sound samples is a bit easier.
+	Float Offset = libs.GetRubberSoundOffset()
+	min += Offset
+	max += Offset
+
+	zadx_SndSoundReBreathingNormal.Play(who)
+	self.RegisterForSingleUpdate(Utility.RandomFloat(min,max))
+	Return
+EndEvent
+
+
